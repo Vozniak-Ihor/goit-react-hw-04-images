@@ -1,29 +1,27 @@
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
+import { useState } from 'react';
 
-export class Searchbar extends Component {
-  state = {
-    value: '',
+export function Searchbar({onSubmit}) {
+  const [value, setValue] = useState('') 
+
+ const handleChange = event => {
+    setValue(event.target.value);
   };
 
-  handleChange = event => {
-    this.setState({ value: event.target.value });
-  };
-
-  onSubmit = event => {
+ const onSend = event => {
     event.preventDefault();
-    if (this.state.value === '') {
+    if (value === '') {
       alert('You have not entered anything');
       return;
     }
-    this.props.onSubmit(this.state.value);
+    onSubmit(value);
   };
 
-  render() {
+
     return (
       <header className={css.Searchbar}>
-        <form className={css.SearchForm} onSubmit={this.onSubmit}>
+        <form className={css.SearchForm} onSubmit={onSend}>
           <button type="submit" className={css.SearchFormButton}>
             🔍
             <span className={css.SearchFormButtonLabel}>Search</span>
@@ -34,14 +32,14 @@ export class Searchbar extends Component {
             type="text"
             autoComplete="off"
             autoFocus
-            value={this.state.value}
-            onChange={this.handleChange}
+            value={value}
+            onChange={handleChange}
             placeholder="Search images and photos"
           />
         </form>
       </header>
     );
-  }
+  
 }
 
 Searchbar.propTypes = {
