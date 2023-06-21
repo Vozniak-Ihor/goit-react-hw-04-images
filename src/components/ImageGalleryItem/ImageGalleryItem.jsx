@@ -1,6 +1,11 @@
 import css from './ImageGalleryItem.module.css';
 import PropTypes from 'prop-types';
-export const ImageGalleryItem = ({ image, alt, largeImage, handleModalClick }) => {
+export const ImageGalleryItem = ({
+  image,
+  alt,
+  largeImage,
+  handleModalClick,
+}) => {
   return (
     <li
       className={css.ImageGalleryItem}
@@ -24,4 +29,4 @@ ImageGalleryItem.propTypes = {
   handleModalClick: PropTypes.func.isRequired,
 };
 
-export default ImageGalleryItem
+export default ImageGalleryItem;

@@ -2,14 +2,14 @@ import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
 import { useState } from 'react';
 
-export function Searchbar({onSubmit}) {
-  const [value, setValue] = useState('') 
+export function Searchbar({ onSubmit }) {
+  const [value, setValue] = useState('');
 
- const handleChange = event => {
+  const handleChange = event => {
     setValue(event.target.value);
   };
 
- const onSend = event => {
+  const onSend = event => {
     event.preventDefault();
     if (value === '') {
       alert('You have not entered anything');
@@ -18,28 +18,26 @@ export function Searchbar({onSubmit}) {
     onSubmit(value);
   };
 
+  return (
+    <header className={css.Searchbar}>
+      <form className={css.SearchForm} onSubmit={onSend}>
+        <button type="submit" className={css.SearchFormButton}>
+          🔍
+          <span className={css.SearchFormButtonLabel}>Search</span>
+        </button>
 
-    return (
-      <header className={css.Searchbar}>
-        <form className={css.SearchForm} onSubmit={onSend}>
-          <button type="submit" className={css.SearchFormButton}>
-            🔍
-            <span className={css.SearchFormButtonLabel}>Search</span>
-          </button>
-
-          <input
-            className={css.SearchFormInput}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            value={value}
-            onChange={handleChange}
-            placeholder="Search images and photos"
-          />
-        </form>
-      </header>
-    );
-  
+        <input
+          className={css.SearchFormInput}
+          type="text"
+          autoComplete="off"
+          autoFocus
+          value={value}
+          onChange={handleChange}
+          placeholder="Search images and photos"
+        />
+      </form>
+    </header>
+  );
 }
 
 Searchbar.propTypes = {
