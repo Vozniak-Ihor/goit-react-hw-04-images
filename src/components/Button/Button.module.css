@@ -1,0 +1,52 @@
+.Button {
+  margin-right: auto;
+  margin-left: auto;
+  font-weight: 700;
+  text-align: center;
+  width: 300px;
+  padding: 1em 2em;
+  border: 2px solid #000000;
+  background: white;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  color: black;
+  cursor: pointer;
+  transition: 1s;
+  z-index: 1;
+}
+
+.Button:hover{
+  background: white;
+  border: 2px solid #ffffff;
+}
+
+.Button::before,
+.Button::after {
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  transition: all 0.7s;
+  background: #3f51b5;
+  z-index: -1;
+}
+
+.Button::before {
+  top: 0;
+  left: 0;
+  width: 0;
+  clip-path: polygon(0% 0%, 75% 0%, 100% 50%, 75% 100%, 0% 100%);
+}
+
+.Button::after {
+  bottom: 0;
+  right: 0;
+  width: 0;
+  clip-path: polygon(25% 0%, 100% 1%, 100% 100%, 25% 100%, 0% 50%);
+}
+
+.Button:hover::before,
+.Button:hover::after {
+  width: 30%;
+}
