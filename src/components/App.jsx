@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import ImageGallery from './ImageGallery/ImageGallery';
 import { Searchbar } from 'components/Searchbar/Searchbar';
 import { Button } from 'components/Button/Button';
@@ -6,41 +5,38 @@ import { Loader } from 'components/Loader/Loader';
 import { Modal } from 'components/Modal/Modal';
 import api from '../service/image-service';
 import css from './App.module.css';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
-export class App extends Component {
-  state = {
-    images: [],
-    query: '',
-    page: 1,
-    isEmpty: false,
-    isVisible: false,
-    error: null,
-    isLoading: false,
+export function App() {
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [isEmpty, setIsEmpty] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loader, setLoader] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImage, setLargeImage] = useState('');
+  const [showButton, setShowButton] = useState(false);
+
+
+  useEffect(() => {
+    getPhotos(query, page);
+  }, [query, page]);
+
+  const onSubmit = value => {
+    setImages([]);
+    setQuery(value);
+    setPage(1);
+    setIsEmpty(false);
+    setIsVisible(false);
+    setError(null);
+    setIsLoading(true);
   };
 
-  componentDidUpdate(_, prevState) {
-    const { query, page } = this.state;
-    if (prevState.query !== query || prevState.page !== page) {
-      this.getPhotos(query, page);
-    }
-  }
-
-  onSubmit = value => {
-    this.setState({
-      images: [],
-      query: value,
-      page: 1,
-      isEmpty: false,
-      isVisible: false,
-      error: null,
-      isLoading: true,
-      loader: true,
-      showModal: false,
-      largeImage: '',
-    });
-  };
-
-  getPhotos = (query, page) => {
+  const getPhotos = (query, page) => {
     api
       .fetchImages(query, page)
       .then(response => {
@@ -48,85 +44,68 @@ export class App extends Component {
       })
       .then(({ hits, totalHits, page }) => {
         if (hits.length === 0) {
-          this.setState({ isEmpty: true });
+          setIsEmpty(true);
           return;
         }
 
         if (totalHits > 12) {
-          this.setState(prevState => ({
-            isEmpty: false,
-            images: page === 1 ? hits : [...prevState.images, ...hits],
-            showButton: page < Math.ceil(totalHits / 12),
-            isVisible: true,
-            isLoading: false,
-          }));
+          setIsEmpty(false);
+          setImages(prevState => (page === 1 ? hits : [...prevState, ...hits]));
+          setShowButton(page < Math.ceil(totalHits / 12));
+          setIsVisible(true);
+          isLoading(false);
         } else {
-          this.setState(prevState => ({
-            isEmpty: false,
-            images: page === 1 ? hits : [...prevState.images, ...hits],
-            showButton: page < Math.ceil(totalHits / 12),
-            isVisible: false,
-            isLoading: false,
-          }));
+          setIsEmpty(false);
+          setImages(prevState => (page === 1 ? hits : [...prevState, ...hits]));
+          setShowButton(page < Math.ceil(totalHits / 12));
+          setIsVisible(false);
+          isLoading(false);
         }
       })
 
       .catch(error => {
-        this.setState({ error });
+        setError(error);
       })
       .finally(() => {
-        this.setState({ isLoader: false, loader: false });
+        // this.setState({ isLoader: false, loader: false });
+        setLoader(false);
       });
   };
 
-  handleModalClick = largeImage => {
-    this.setState({ largeImage, showModal: true });
+  const handleModalClick = largeImage => {
+    // this.setState({ largeImage, showModal: true });
     // console.log(this.state.largeImage);
+    setLargeImage(largeImage);
+    setShowModal(true);
   };
 
-  onLoadeMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1, loader: true }));
+  const onLoadeMore = () => {
+    // this.setState(prevState => ({ page: prevState.page + 1, loader: true }));
+    setPage(prevState => prevState.page + 1);
+    setLoader(true);
   };
 
-  onClose = () => {
-    this.setState({ showModal: false });
+  const onClose = () => {
+    setShowModal(false);
   };
-  render() {
-    const {
-      images,
-      isEmpty,
-      isVisible,
-      error,
-      largeImage,
-      isLoading,
-      loader,
-      showModal,
-    } = this.state;
-    return (
-      <>
-        <div className={css.App}>
-          <Searchbar onSubmit={this.onSubmit} />
-          {isEmpty && (
-            <b textalign="center">Sorry. There are no images ... 😭</b>
-          )}
-          {error && <b textAlign="center">Sorry.{error} 😭</b>}
-          <ImageGallery
-            images={images}
-            handleModalClick={this.handleModalClick}
+
+  return (
+    <>
+      <div className={css.App}>
+        <Searchbar onSubmit={onSubmit} />
+        {isEmpty && <b textalign="center">Sorry. There are no images ... 😭</b>}
+        {error && <b textAlign="center">Sorry.{error} 😭</b>}
+        <ImageGallery images={images} handleModalClick={handleModalClick} />
+        {isVisible && (
+          <Button
+            onLoadeMore={onLoadeMore}
+            isLoading={isLoading}
+            text={isLoading ? 'Loading' : 'Show more'}
           />
-          {isVisible && (
-            <Button
-              onLoadeMore={this.onLoadeMore}
-              isLoading={this.state.isLoading}
-              text={isLoading ? 'Loading' : 'Show more'}
-            />
-          )}
-          {loader && <Loader />}
-          {showModal && (
-            <Modal largeImage={largeImage} onClose={this.onClose} />
-          )}
-        </div>
-      </>
-    );
-  }
+        )}
+        {loader && <Loader />}
+        {showModal && <Modal largeImage={largeImage} onClose={onClose} />}
+      </div>
+    </>
+  );
 }
