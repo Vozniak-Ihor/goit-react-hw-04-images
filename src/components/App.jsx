@@ -21,11 +21,53 @@ export function App() {
   const [largeImage, setLargeImage] = useState('');
   const [showButton, setShowButton] = useState(false);
 
-
   useEffect(() => {
-    getPhotos(query, page);
-  }, [query, page]);
+    if (!query) {
+      return;
+    }
 
+    const getPhotos = (query, page) => {
+      api
+        .fetchImages(query, page)
+        .then(response => {
+          return response.json();
+        })
+        .then(({ hits, totalHits, page }) => {
+          if (hits.length === 0) {
+            setIsEmpty(true);
+            return;
+          }
+
+          if (totalHits > 12) {
+            setIsEmpty(false);
+            setImages(prevState =>
+              page === 1 ? hits : [...prevState, ...hits]
+            );
+            setShowButton(page < Math.ceil(totalHits / 12));
+            setIsVisible(true);
+            setIsLoading(false);
+          } else {
+            setIsEmpty(false);
+            setImages(prevState =>
+              page === 1 ? hits : [...prevState, ...hits]
+            );
+            setShowButton(page < Math.ceil(totalHits / 12));
+            setIsVisible(false);
+            setIsLoading(false);
+          }
+        })
+
+        .catch(error => {
+          setError(error);
+        })
+        .finally(() => {
+          // this.setState({ isLoader: false, loader: false });
+          setLoader(false);
+        });
+    };
+    getPhotos(query, page);
+  }, [page, query]);
+  
   const onSubmit = value => {
     setImages([]);
     setQuery(value);
@@ -34,42 +76,6 @@ export function App() {
     setIsVisible(false);
     setError(null);
     setIsLoading(true);
-  };
-
-  const getPhotos = (query, page) => {
-    api
-      .fetchImages(query, page)
-      .then(response => {
-        return response.json();
-      })
-      .then(({ hits, totalHits, page }) => {
-        if (hits.length === 0) {
-          setIsEmpty(true);
-          return;
-        }
-
-        if (totalHits > 12) {
-          setIsEmpty(false);
-          setImages(prevState => (page === 1 ? hits : [...prevState, ...hits]));
-          setShowButton(page < Math.ceil(totalHits / 12));
-          setIsVisible(true);
-          isLoading(false);
-        } else {
-          setIsEmpty(false);
-          setImages(prevState => (page === 1 ? hits : [...prevState, ...hits]));
-          setShowButton(page < Math.ceil(totalHits / 12));
-          setIsVisible(false);
-          isLoading(false);
-        }
-      })
-
-      .catch(error => {
-        setError(error);
-      })
-      .finally(() => {
-        // this.setState({ isLoader: false, loader: false });
-        setLoader(false);
-      });
   };
 
   const handleModalClick = largeImage => {
@@ -81,7 +87,7 @@ export function App() {
 
   const onLoadeMore = () => {
     // this.setState(prevState => ({ page: prevState.page + 1, loader: true }));
-    setPage(prevState => prevState.page + 1);
+    setPage(page + 1);
     setLoader(true);
   };
 
