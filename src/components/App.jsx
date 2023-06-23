@@ -19,7 +19,6 @@ export function App() {
   const [loader, setLoader] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [largeImage, setLargeImage] = useState('');
-  const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
     if (!query) {
@@ -43,7 +42,6 @@ export function App() {
             setImages(prevState =>
               page === 1 ? hits : [...prevState, ...hits]
             );
-            setShowButton(page < Math.ceil(totalHits / 12));
             setIsVisible(true);
             setIsLoading(false);
           } else {
@@ -51,7 +49,6 @@ export function App() {
             setImages(prevState =>
               page === 1 ? hits : [...prevState, ...hits]
             );
-            setShowButton(page < Math.ceil(totalHits / 12));
             setIsVisible(false);
             setIsLoading(false);
           }
